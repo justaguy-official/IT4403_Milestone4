@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#08070d">
+  <meta name="description" content="IT 4403 Milestone 4: A responsive Open Library single-page book explorer using jQuery AJAX and Mustache.js.">
+  <title>Book Explorer | Milestone 4 | David Tarver</title>
+  <link rel="stylesheet" href="css/style.css">
+  <!-- Only the two instructor-approved libraries are used. -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js" defer></script>
+  <script src="https://unpkg.com/mustache@4.2.0/mustache.js" defer></script>
+  <script src="js/app.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="shell header-inner">
+      <a class="brand" href="https://dtarver.com/" aria-label="David Tarver course homepage">DAVID TARVER <span>/ M4</span></a>
+      <nav class="header-links" aria-label="Course project links">
+        <a href="https://dtarver.com/milestone3/" target="_blank" rel="noopener noreferrer">Milestone 3 <span aria-hidden="true">↗</span></a>
+        <a href="https://openlibrary.org/" target="_blank" rel="noopener noreferrer">Open Library <span aria-hidden="true">↗</span></a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="hero" aria-labelledby="pageHeading">
+      <div>
+        <p class="kicker">Open Library API / IT 4403 Milestone 4</p>
+        <h1 id="pageHeading">Find your next <span class="accent">book.</span></h1>
+        <p class="hero-copy">Search titles, explore science fiction, switch between grid and list layouts, and see every detail in one place.</p>
+        <div class="hero-tags" aria-label="Built with">
+          <span>JQUERY AJAX</span><span>MUSTACHE.JS</span><span>SINGLE-PAGE APP</span>
+        </div>
+      </div>
+      <div class="hero-graphic" aria-hidden="true"><span class="graphic-star">✦</span><span>READ<br>EXPLORE<br>DISCOVER</span></div>
+    </section>
+
+    <div class="app-head">
+      <div class="tab-list" role="tablist" aria-label="Browse books">
+        <button id="tabSearch" type="button" role="tab" aria-controls="searchPanel" aria-selected="true" tabindex="0" class="tab-button is-active" data-tab="search">Search Results</button>
+        <button id="tabCollection" type="button" role="tab" aria-controls="collectionPanel" aria-selected="false" tabindex="-1" class="tab-button" data-tab="collection">Science Fiction Collection</button>
+      </div>
+      <p class="app-note">Choose a book to see its details without leaving the page.</p>
+    </div>
+
+    <div class="workspace">
+      <div class="main-column">
+        <section id="searchPanel" class="content-panel" role="tabpanel" aria-labelledby="tabSearch">
+          <div class="search-panel">
+            <div class="section-header">
+              <div><p class="kicker">01 / Explore</p><h2>Book Search</h2></div>
+              <p class="section-note">Up to 50 matches · 10 per page</p>
+            </div>
+            <form id="searchForm" novalidate>
+              <label class="field-label" for="searchInput">Search by book title or keyword</label>
+              <div class="search-row">
+                <input type="search" id="searchInput" name="query" maxlength="150" placeholder="Try Dune, fantasy, computer networking..." autocomplete="off" required>
+                <button class="primary-button" id="searchButton" type="submit">Search <span aria-hidden="true">→</span></button>
+              </div>
+            </form>
+          </div>
+
+          <div class="result-bar">
+            <div><p class="kicker">02 / Results</p><h2>Search Results</h2></div>
+            <div class="view-switch" role="group" aria-label="Search results layout">
+              <button type="button" class="view-button is-active" data-scope="search" data-layout="grid" aria-pressed="true">▦ <span>Grid View</span></button>
+              <button type="button" class="view-button" data-scope="search" data-layout="list" aria-pressed="false">☷ <span>List View</span></button>
+            </div>
+          </div>
+          <p id="searchStatus" class="status-message" role="status" aria-live="polite">Enter a keyword above to search Open Library.</p>
+          <p id="resultSummary" class="section-note result-summary">Your matches will appear below.</p>
+          <div id="searchResults" class="books books--grid" aria-live="polite" aria-busy="false">
+            <div class="empty-state"><span class="empty-icon" aria-hidden="true">⌕</span><strong>Ready when you are</strong><p>Search the Open Library catalog to discover books.</p></div>
+          </div>
+          <nav id="paginationRegion" class="pagination" aria-label="Search result pages" hidden>
+            <button type="button" id="previousPage" class="page-arrow">← Previous</button>
+            <div id="pageButtons" class="page-buttons"></div>
+            <button type="button" id="nextPage" class="page-arrow">Next →</button>
+            <span id="pageIndicator" class="page-indicator" aria-live="polite"></span>
+          </nav>
+        </section>
+
+        <section id="collectionPanel" class="content-panel" role="tabpanel" aria-labelledby="tabCollection" hidden>
+          <div class="collection-hero">
+            <p class="kicker">03 / Curated subject</p>
+            <h2>Science Fiction <span class="accent">Collection.</span></h2>
+            <p>Ten books pulled live from the Open Library Science Fiction subject — the same collection used in Milestone 3.</p>
+            <a class="text-link" href="https://openlibrary.org/subjects/science_fiction" target="_blank" rel="noopener noreferrer">Explore subject on Open Library ↗</a>
+          </div>
+          <div class="result-bar">
+            <div><p class="kicker">Browse the collection</p><h2>Featured Books</h2></div>
+            <div class="view-switch" role="group" aria-label="Collection layout">
+              <button type="button" class="view-button is-active" data-scope="collection" data-layout="grid" aria-pressed="true">▦ <span>Grid View</span></button>
+              <button type="button" class="view-button" data-scope="collection" data-layout="list" aria-pressed="false">☷ <span>List View</span></button>
+            </div>
+          </div>
+          <p id="collectionStatus" class="status-message" role="status" aria-live="polite">Loading the Science Fiction collection…</p>
+          <div id="collectionResults" class="books books--grid" aria-live="polite" aria-busy="true"></div>
+          <button id="retryCollection" type="button" class="secondary-button" hidden>Retry Collection</button>
+        </section>
+      </div>
+
+      <aside id="detailsSection" class="details-section" aria-labelledby="detailsHeading" aria-busy="false">
+        <div class="details-header"><div><p class="kicker">04 / Details on demand</p><h2 id="detailsHeading">Selected Book</h2></div><span class="live-dot" title="Updated in this page">SPA</span></div>
+        <div id="detailsContent" class="details-content" aria-live="polite">
+          <div class="details-empty"><div class="details-icon" aria-hidden="true">↗</div><strong>No book selected</strong><p>Choose a book from the results or collection. Its full details will appear here without reloading this page.</p></div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="site-footer"><div class="shell footer-inner"><span>IT 4403 — Advanced Web and Mobile Applications</span><span>© 2026 David Tarver · Open Library API</span></div></footer>
+  <noscript><div class="noscript-message">JavaScript is required to search and browse this application.</div></noscript>
+
+  <!-- Mustache templates: HTML stays separate from js/app.js data processing. -->
+  <script id="searchBookTemplate" type="text/x-mustache">
+    {{#books}}
+    <article class="book-card {{#selected}}is-selected{{/selected}}">
+      <button type="button" class="book-pick" data-work-id="{{id}}" aria-label="View details for {{title}}" {{^canSelect}}disabled{{/canSelect}}>
+        <span class="book-cover">
+          {{#hasCover}}<img src="{{coverUrl}}" alt="Cover of {{title}}" loading="lazy">{{/hasCover}}
+          {{^hasCover}}<span class="no-cover">No cover available</span>{{/hasCover}}
+        </span>
+        <span class="book-information">
+          <span class="book-eyebrow">OPEN LIBRARY WORK</span>
+          <strong class="book-title">{{title}}</strong>
+          <span class="book-author">{{authorText}}</span>
+          <span class="book-small">{{publicationText}}</span>
+          <span class="book-id">{{idLabel}}</span>
+          {{#canSelect}}<span class="book-action">View book details ↗</span>{{/canSelect}}
+        </span>
+      </button>
+    </article>
+    {{/books}}
+  </script>
+
+  <script id="collectionBookTemplate" type="text/x-mustache">
+    {{#books}}
+    <article class="book-card collection-card {{#selected}}is-selected{{/selected}}">
+      <button type="button" class="book-pick" data-work-id="{{id}}" aria-label="View details for {{title}}" {{^canSelect}}disabled{{/canSelect}}>
+        <span class="book-cover">
+          {{#hasCover}}<img src="{{coverUrl}}" alt="Cover of {{title}}" loading="lazy">{{/hasCover}}
+          {{^hasCover}}<span class="no-cover">No cover available</span>{{/hasCover}}
+        </span>
+        <span class="book-information">
+          <span class="book-eyebrow">SCIENCE FICTION</span>
+          <strong class="book-title">{{title}}</strong>
+          <span class="book-author">{{authorText}}</span>
+          <span class="book-small">{{publicationText}}</span>
+          <span class="book-id">{{idLabel}}</span>
+          {{#canSelect}}<span class="book-action">View book details ↗</span>{{/canSelect}}
+        </span>
+      </button>
+    </article>
+    {{/books}}
+  </script>
+
+  <script id="bookDetailsTemplate" type="text/x-mustache">
+    <article class="detail-card">
+      <div class="detail-cover">
+        {{#hasCover}}<img src="{{coverUrl}}" alt="Cover of {{title}}">{{/hasCover}}
+        {{^hasCover}}<span class="no-cover">Cover not available</span>{{/hasCover}}
+      </div>
+      <div class="detail-body">
+        <p class="kicker">Selected Open Library work</p>
+        <h3>{{title}}</h3>
+        <div class="detail-meta">
+          <div><span class="meta-label">Work ID</span><span>{{id}}</span></div>
+          <div><span class="meta-label">Authors</span><span id="detailAuthors">{{authorText}}</span></div>
+          <div><span class="meta-label">First published</span><span>{{publicationText}}</span></div>
+          <div><span class="meta-label">Language</span><span>{{languageText}}</span></div>
+        </div>
+        <span class="meta-label section-meta-label">Description</span>
+        <p class="detail-description">{{description}}</p>
+        <span class="meta-label section-meta-label">Subjects (up to 10)</span>
+        {{#hasSubjects}}<ul class="subjects">{{#subjects}}<li>{{name}}</li>{{/subjects}}</ul>{{/hasSubjects}}
+        {{^hasSubjects}}<p class="detail-fallback">No subjects are available for this book.</p>{{/hasSubjects}}
+        <a class="external-link" href="{{openLibraryUrl}}" target="_blank" rel="noopener noreferrer">View original Open Library record ↗</a>
+      </div>
+    </article>
+  </script>
+</body>
+</html>
